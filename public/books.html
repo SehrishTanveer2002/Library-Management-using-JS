@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-cover h-screen" style="background-image: url('/images/library_bg.jpg');">
+        <div class="relative z-10 flex flex-col justify-center items-center h-full">
+          <div class="text-center mb-5 mt-10">
+            <h1 class="text-3xl font-bold text-white">View Books</h1>
+          </div>
+      
+          <!-- Display added books -->
+          <div id="books-list" class="mt-10 max-w-xl w-1/2 p-4 bg-black bg-opacity-50 shadow-md rounded-md">
+            <h2 class="text-2xl font-bold text-white mb-4">Added Books</h2>
+            <table class="min-w-full text-left text-sm text-white">
+              <thead>
+                <tr>
+                  <th class="px-6 py-3">Name</th>
+                  <th class="px-6 py-3">Author</th>
+                  <th class="px-6 py-3">Publisher</th>
+                  <th class="px-6 py-3">Pages</th>
+                  <th class="px-6 py-3">Serial Number</th>
+                  <th class="px-6 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="books-display">
+              </tbody>
+            </table>
+          </div>
+          <button id="clear-all-btn" class="bg-amber-400 text-black font-bold py-2 px-4 rounded inline-flex items-center hover:bg-amber-500">
+            Clear All
+          </button>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const booksDisplay = document.getElementById('books-display');
+            const clearAllButton = document.getElementById('clear-all-btn');
+            let storedBooks = JSON.parse(localStorage.getItem('books')) || [];
+        
+            function renderBooks() {
+                booksDisplay.innerHTML = ''; 
+                storedBooks.forEach((book, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-3">${book.bookName}</td>
+                        <td class="px-6 py-3">${book.author}</td>
+                        <td class="px-6 py-3">${book.publisher}</td>
+                        <td class="px-6 py-3">${book.pages}</td>
+                        <td class="px-6 py-3">${book.isbn}</td>
+                        <td class="px-6 py-3">
+                            <i class="edit-icon fas fa-edit text-blue-500 text-xl cursor-pointer" data-index="${index}" title="Edit"></i>
+                            <i class="delete-icon fas fa-trash text-red-500 text-xl cursor-pointer" data-index="${index}" title="Delete"></i>
+                        </td>
+                    `;
+                    booksDisplay.appendChild(row);
+                });
+        
+                document.querySelectorAll('.delete-icon').forEach((deleteBtn) => {
+                    deleteBtn.addEventListener('click', (e) => {
+                        const bookIndex = e.target.getAttribute('data-index');
+                        deleteBook(bookIndex);
+                    });
+                });
+        
+                document.querySelectorAll('.edit-icon').forEach((editBtn) => {
+                    editBtn.addEventListener('click', (e) => {
+                        const bookIndex = e.target.getAttribute('data-index');
+                        localStorage.setItem('editBookIndex', bookIndex); 
+                        window.location.href = 'index.html';
+                    });
+                });
+            }
+        
+            function deleteBook(index) {
+                storedBooks.splice(index, 1);
+                localStorage.setItem('books', JSON.stringify(storedBooks));
+                renderBooks(); 
+            }
+
+            renderBooks();
+
+            clearAllButton.addEventListener('click', () => {
+                localStorage.removeItem('books');
+                storedBooks = [];
+                booksDisplay.innerHTML = '';
+            });
+        });
+        </script> 
+</body>
+
+</html>
